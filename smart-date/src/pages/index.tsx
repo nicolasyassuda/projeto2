@@ -18,7 +18,6 @@ export default function Home() {
       <Header definirPagina={definirPagina}></Header>
       {pagina==1&&<PaginaInicio></PaginaInicio>}
       {pagina==2&&<PaginaRotinas></PaginaRotinas>}
-      {/* <Footer></Footer> */}
     </div>
   )
 }

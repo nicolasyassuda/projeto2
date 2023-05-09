@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Note, Rotina
+from .models import Note, Atividades
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -7,7 +7,7 @@ class NoteSerializer(serializers.ModelSerializer):
         model = Note
         fields = ['id', 'title', 'content','tag']
 
-class RotinasSerializer(serializers.ModelSerializer):
+class AtividadesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Rotina
-        fields = ["nome","descricao","setor","dia","mes","ano"]
+        model = Atividades
+        fields = ["name","description","role","day","month","year","feito","id"]

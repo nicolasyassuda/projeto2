@@ -1,21 +1,22 @@
 import Dias from "./Dias"
 
 interface PropsSemanas {
-    domingos:string[],
-    segundas:string[],
-    tercas:string[],
-    quartas:string[],
-    quintas:string[],
-    sextas:string[],
-    sabados:string[]
+    domingos: string[],
+    segundas: string[],
+    tercas: string[],
+    quartas: string[],
+    quintas: string[],
+    sextas: string[],
+    sabados: string[],
+    rotinas:any[]
 }
 
 export default function Mes(props: PropsSemanas) {
-    const {domingos,segundas,tercas,quartas,quintas,sextas,sabados} = props;
-    console.log(props.segundas)
+    const { domingos, segundas, tercas, quartas, quintas, sextas, sabados,rotinas } = props;
+    console.log(rotinas)
     function renderizaDiaDaSemana(diaDaSemana: string[]) {
         return diaDaSemana.map(dia =>
-            <Dias key={dia} dia={dia}></Dias>
+            <Dias key={dia} data={dia} rotinas={rotinas}></Dias>
         )
     }
     return (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Mes from "./Mes/Mes";
 import moment from "moment"
-
+import axios from "axios"
 interface PaginaRotinasProps {
 
 }
@@ -9,8 +9,7 @@ export default function PaginaRotinas(props: PaginaRotinasProps) {
     const [ano, setAno] = useState(moment().locale("pt-br").year())
     const [mes, setMes] = useState(moment().locale("pt-br").month() + 1)
     // 0 - Domingo; 1-Segunda ; 2-Terça ; 3-Quarta; 4-Quinta; 5-Sexta ; 6-Sabado
-    const [pagina, setPagina] = useState(0);
-
+    const [feriados,setFeriados]= useState<any[]> ([]);
     const [diasDomingo, setDiasDomingo] = useState<any[]>([]);
     const [diasSegunda, setDiasSegunda] = useState<any[]>([]);
     const [diasTerca, setDiasTerca] = useState<any[]>([]);
@@ -19,11 +18,13 @@ export default function PaginaRotinas(props: PaginaRotinasProps) {
     const [diasSexta, setDiasSexta] = useState<any[]>([]);
     const [diasSabado, setDiasSabado] = useState<any[]>([]);
     const [label, setLabel] = useState("");
-    const [rotinas,setRotinas] = useState<any[]>([]);
+    const [rotinas, setRotinas] = useState<any[]>([]);
+    const [dados,setDados] = useState(false)
     useEffect(() => {
         criarCalendarioMes(ano, mes)
         obterRotinas(ano, mes)
-    }, [mes, ano])
+        getFeriados()
+    }, [mes, ano,dados])
     // const obterRotinas = async (ano:number,mes:number) => {
     //     const Rotinas = await fetch('./api/obterRotinas', {
     //         method: 'POST',
@@ -41,10 +42,14 @@ export default function PaginaRotinas(props: PaginaRotinasProps) {
     //         console.log(retorno)
     //     }
     // }
+    function obterDados(valor:boolean){
+        setDados(valor)
+        return valor
+    }
     async function obterRotinas(ano: number, mes: number) {
-        const axios = require("axios")
+
         try {
-            const res = await axios.get("http://localhost:8000/Rotinas/get/"+ano+"/"+mes, {
+            const res = await axios.get("http://localhost:8000/Rotinas/get/" + ano + "/" + mes, {
                 headers: {
                     "Content-Type": "application/json"
                 }
@@ -55,6 +60,33 @@ export default function PaginaRotinas(props: PaginaRotinasProps) {
             console.error(err)
         }
 
+    }
+    async function getFeriados() {
+        const mesFormatado = mes.toString().length < 2? "0"+mes.toString(): mes.toString()
+        const mesFormatadoFinal = mes.toString().length < 2? "0"+(mes+1).toString(): mes==12 ? "0"+(1).toString():(mes+1).toString()
+        const anoSeMudar = mes==12 ?(ano+1):ano
+        const options = {
+            method: 'GET',
+            url: 'https://working-days.p.rapidapi.com/1.3/analyse',
+            params: {
+            start_date: ano+"-"+mesFormatado+"-"+"01",
+                end_date: anoSeMudar+"-"+mesFormatadoFinal+"-"+"01",
+                country_code: 'BR',
+                end_time: '18:15',
+                start_time: '09:14'
+            },
+            headers: {
+                'X-RapidAPI-Key': '3fb982f962mshb37f4c3121d9b29p1dcdb5jsnf2d22569936a',
+                'X-RapidAPI-Host': 'working-days.p.rapidapi.com'
+            }
+        };
+        try {
+            const res = await axios.request(options);
+            setFeriados(res.data.public_holidays.list)
+        }
+        catch(err){
+            console.error(err)
+        }
     }
     function RecuarPagina() {
         if (mes == moment().locale("pt-br").month() + 1 && ano == moment().locale("pt-br").year()) {
@@ -187,7 +219,7 @@ export default function PaginaRotinas(props: PaginaRotinasProps) {
     }
     function renderizarMes() {
 
-        return <Mes rotinas={rotinas} domingos={diasDomingo} segundas={diasSegunda} tercas={diasTerca} quartas={diasQuarta} quintas={diasQuinta} sextas={diasSexta} sabados={diasSabado}></Mes>
+        return <Mes obterDados={obterDados} feriados={feriados} rotinas={rotinas} domingos={diasDomingo} segundas={diasSegunda} tercas={diasTerca} quartas={diasQuarta} quintas={diasQuinta} sextas={diasSexta} sabados={diasSabado}></Mes>
 
     }
     return (

@@ -21,3 +21,8 @@ class Atividades(models.Model):
     year = models.TextField()
     feito = models.BooleanField()
     id = models.BigAutoField(primary_key=True)
+
+class FunFact(models.Model):
+    #id = models.BigAutoField(primary_key=True)
+    #text = models.TextField()
+    fact = models.TextField()

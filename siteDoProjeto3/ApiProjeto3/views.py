@@ -5,7 +5,8 @@ from django.http import Http404
 from .serializers import AtividadesSerializer
 # Create your views here.
 import pymongo
-from .models import Atividades
+from .models import Atividades, FunFact
+
 client = pymongo.MongoClient('mongodb://nicolasyassuda:nicolasyassuda09022003@15.229.166.67/projeto3')
 db = client['projeto3']
 coll = db['rotinas']
@@ -50,3 +51,32 @@ def pegarRotinas(request,ano,mes):
         ListaSerializedRotinas.append(rotinas)
     return Response(AtividadesSerializer(ListaSerializedRotinas,many=True).data)
     # return Response(200)
+
+from .serializers import FunFactSerializer
+
+@api_view(['POST', 'GET'])
+def fun_fact(request):
+    if request.method == 'POST':
+        #novo = FunFact(id = request.data['id'], text = request.data['text'])
+        novo = FunFact(fact = request.data['fact'])
+        novo.save()
+        serializer = FunFactSerializer(novo)
+        return Response(serializer.data)
+
+    else:
+        facts = FunFact.objects.all()
+        serializer = FunFactSerializer(facts, many=True)
+        return Response(serializer.data)
+
+
+from rest_framework import status
+
+@api_view(['DELETE'])
+def delete_fun_fact(request, id):
+    try:
+        fact = FunFact.objects.get(id=id)
+    except FunFact.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    fact.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
